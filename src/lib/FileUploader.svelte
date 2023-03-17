@@ -10,6 +10,11 @@
     let progress = 0;
     let source: File | null = null;
     let uploader: tus.Upload | null = null;
+
+    let endpoint = "http://localhost:5002/api/v1/videos/";
+    function input(this: HTMLInputElement) {
+        endpoint = this.value;
+    }
     function change(this: HTMLInputElement, event: any) {
         const file = this.files.item(0);
         console.log(file);
@@ -17,7 +22,7 @@
         if (file) {
             source = file;
             uploader = new tus.Upload(source, {
-                endpoint: "http://127.0.0.1:5002/api/v1/media/video/",
+                endpoint,
                 retryDelays: [0, 3000, 5000, 10000, 20000],
                 metadata: {
                     filename: source.name,
@@ -45,11 +50,12 @@
                     paused = false;
 
                     // use this api to get upload data `uploader`
-                    console.log(
-                        "Download %s from %s",
-                        uploader.file,
-                        uploader.url
-                    );
+                    console.log(uploader);
+                    // console.log(
+                    //     "Download %s from %s",
+                    //     uploader.file,
+                    //     uploader.url
+                    // );
                 },
             });
         }
@@ -86,6 +92,8 @@
 
 <form method="post" on:submit|preventDefault={submit}>
     <h1>File Uploader</h1>
+    <label for="endpoint">Endpoint</label>
+    <input type="url" name="endpoint" id="endpoint" on:input={input} value="{endpoint}" />
     <label for="uploader">Video</label>
     <input type="file" name="video" id="uploader" on:change={change} />
     {#if progress}
